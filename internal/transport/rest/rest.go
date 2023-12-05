@@ -16,6 +16,10 @@ func InitServer() {
 	})
 	initObjectsRouter(router)
 	initUsersRouter(router)
-	router.Use(midlewares.CheckAuthorization)
+	initRequestsRouter(router)
+	router.Use(midlewares.LoggingMiddleware)
+	router.Use(midlewares.RecoveryMiddleware)
+	router.Use(midlewares.GlobalHeadersMiddleware)
+	// router.Use(midlewares.CheckAuthorization)
 	log.Fatal(http.ListenAndServe(":8000", router))
 }

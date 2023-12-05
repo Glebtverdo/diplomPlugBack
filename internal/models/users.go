@@ -13,6 +13,19 @@ type User struct {
 	MiddleName string `json:"middleName"`
 }
 
+type UserInfo struct {
+	Id         int    `json:"id"`
+	FirstName  string `json:"firstName"`
+	LastName   string `json:"lastName"`
+	MiddleName string `json:"middleName"`
+}
+
+type UserInfoNoId struct {
+	FirstName  string `json:"firstName"`
+	LastName   string `json:"lastName"`
+	MiddleName string `json:"middleName"`
+}
+
 type UserBody struct {
 	Login      string `json:"login"`
 	Password   string `json:"password"`
@@ -28,7 +41,7 @@ type UserLoginStruct struct {
 
 type JwtClaims struct {
 	Type string
-	User
+	UserInfo
 	jwt.StandardClaims
 }
 

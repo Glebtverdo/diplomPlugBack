@@ -73,5 +73,6 @@ func initRequestsRouter(router *mux.Router) {
 	router.HandleFunc("/requests/get_all", getAllRequests).Methods("GET")
 	router.HandleFunc("/requests/create", createNewRequest).Methods("Post")
 	router.HandleFunc("/requests/delete/{id:[0-9]+}", deleteRequest).Methods("Delete")
-	router.HandleFunc("/requests/change", changeRequest).Methods("Put")
+	// router.HandleFunc("/requests/change", changeRequest).Methods("Put")
+	router.HandleFunc("/requests/get_users_request", changeRequest).Methods("GET")
 }

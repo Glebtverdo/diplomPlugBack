@@ -1,9 +1,9 @@
 package models
 
 type Request struct {
-	Id     int    `json:"id"`
-	Object Object `json:"object"`
-	Users  []User `json:"users"`
+	Id        int            `json:"id"`
+	Object    ObjectBody     `json:"object"`
+	Engeeners []UserInfoNoId `json:"users"`
 }
 
 type RequestBody struct {

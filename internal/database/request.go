@@ -9,36 +9,70 @@ import (
 )
 
 func GetAllRequests() ([]models.Request, error) {
-	rows, err := pool.Query(context.Background(), "Select * from requests")
+	rows, err := pool.Query(context.Background(),
+		`Select requests.id as id, name, address, firstCoord,
+			secondCoord, firstname, lastname, middlename  from requests 
+			Join objects on requests.objectId = objects.id
+			Join users_request on requests.id = users_request.requestId
+			Join users on users.id = users_request.userId
+			`)
 	if err != nil {
 		return nil, err
 	}
 	var arr []models.Request
+	writtenRequests := make(map[int]models.Request)
 	for rows.Next() {
-		var obj models.Request
-		rows.Scan(&obj.Id)
-		arr = append(arr, obj)
+		var request models.Request
+		var user models.UserInfoNoId
+		rows.Scan(&request.Id, &request.Object.Name, &request.Object.Address,
+			&request.Object.Coords[0], &request.Object.Coords[1],
+			&user.FirstName, &user.LastName, &user.MiddleName)
+		_, ok := writtenRequests[request.Id]
+		if !ok {
+			writtenRequests[request.Id] = request
+		}
+		request.Engeeners = append(writtenRequests[request.Id].Engeeners, user)
+		writtenRequests[request.Id] = request
+		arr = append(arr, request)
 	}
 	defer rows.Close()
 	return arr, nil
 }
 
 func CreateNewRequest(request models.RequestBody) error {
-	query := ("Insert into objects (name, address) values(@objectName, @objectAddress) RETURNING *")
-	args := pgx.NamedArgs{
-		"objectName":    request.UsersIds,
-		"objectAddress": request.ObjectId,
-	}
-	res, err := pool.Exec(context.Background(), query, args)
+	query := ("Insert into requests (objectId) values($1) RETURNING id")
+	// args := pgx.NamedArgs{
+	// 	"objectName": request.ObjectId,
+	// }
+	ctx := context.Background()
+	transaction, err := pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
-	if res.RowsAffected() == 0 {
-		return fmt.Errorf("can not create this object")
+
+	row := transaction.QueryRow(ctx, query, request.ObjectId)
+	var requestId int
+	row.Scan(&requestId)
+	if requestId == 0 {
+		transaction.Rollback(ctx)
+		return err
 	}
-	// row := pool.QueryRow(context.Background(), "Select * from  objects where name = @objectName", args)
-	// var resultObj models.Request
-	// row.Scan(&resultObj.Id, &resultObj.Name, &resultObj.Address)
+	query = ("Insert into users_request (requestId, userId) values(@requestId, @userId)")
+	for _, userId := range request.UsersIds {
+		args := pgx.NamedArgs{
+			"requestId": requestId,
+			"userId":    userId,
+		}
+		res, err := transaction.Exec(ctx, query, args)
+		if err != nil || res.RowsAffected() == 0 {
+			transaction.Rollback(ctx)
+			return fmt.Errorf("error with user %d", userId)
+		}
+	}
+	err = transaction.Commit(ctx)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

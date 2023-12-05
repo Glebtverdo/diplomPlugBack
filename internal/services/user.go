@@ -3,7 +3,6 @@ package services
 import (
 	"diplomPlugService/internal/database"
 	"diplomPlugService/internal/models"
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -14,7 +13,6 @@ func GetAllUsers() ([]models.User, error) {
 }
 
 func CreateNewUser(user models.UserBody) error {
-	fmt.Println(user.FirstName, user.LastName, user.Login, user.MiddleName)
 	return database.CreateNewUser(user)
 }
 
@@ -30,9 +28,14 @@ func Login(loginPair models.UserLoginStruct) (models.JwtTokenPair, error) {
 	user := database.GetUserByLoginAndPassword(loginPair)
 	payload := models.JwtClaims{
 		Type: "access",
-		User: user,
+		UserInfo: models.UserInfo{
+			Id:         user.Id,
+			FirstName:  user.FirstName,
+			LastName:   user.LastName,
+			MiddleName: user.MiddleName,
+		},
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 168).Unix(),
 			Issuer:    "test",
 		},
 	}

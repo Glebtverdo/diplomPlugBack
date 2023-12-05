@@ -26,6 +26,7 @@ func getAllUsers(w http.ResponseWriter, r *http.Request) {
 
 func createNewUser(w http.ResponseWriter, r *http.Request) {
 	var user models.UserBody
+
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&user)
