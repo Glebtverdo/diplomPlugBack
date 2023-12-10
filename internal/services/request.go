@@ -9,6 +9,10 @@ func GetAllRequests() ([]models.Request, error) {
 	return database.GetAllRequests()
 }
 
+func GetAllUsersRequests(userId int) ([]models.RequestNoEngeeners, error) {
+	return database.GetAllUsersRequests(userId)
+}
+
 func CreateNewRequest(obj models.RequestBody) error {
 	return database.CreateNewRequest(obj)
 }

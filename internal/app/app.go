@@ -2,8 +2,10 @@ package app
 
 import (
 	"diplomPlugService/internal/database"
-	"diplomPlugService/internal/transport/rest"
+	grpcTrasport "diplomPlugService/internal/transport/grpc"
+	restTransport "diplomPlugService/internal/transport/rest"
 	"fmt"
+	"sync"
 )
 
 func RunProject() {
@@ -12,5 +14,14 @@ func RunProject() {
 		fmt.Println(dbError)
 		return
 	}
-	rest.InitServer()
+	go restTransport.InitServer()
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		grpcTrasport.InitServer()
+	}()
+
+	wg.Wait()
 }

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package plugBackGrpc;
+
+option go_package = "diplomPlugBack.plugBackGrpc;plugBackGrpc";
+
+service PlugBackGrpc{
+	rpc Login (LoginRequest) returns (LoginResponse);
+	rpc GetRequests (EmptyRequest) returns (Requests);
+}
+
+message EmptyRequest {}
+
+message LoginRequest{
+	string login = 1;
+	string password = 2;
+}
+
+message LoginResponse{
+	string access = 1;
+	string refresh = 2;	
+}
+
+message Object{
+	int32 id = 1;
+	string name = 2;
+	string address = 3;
+	repeated float coords = 4;
+}
+
+message Request{
+	int32 id = 1;
+	Object object = 2;
+}
+
+message Requests{
+	repeated Request data = 1;
+}

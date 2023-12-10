@@ -107,3 +107,25 @@ func ChangeRequest(obj models.Request) error {
 	}
 	return nil
 }
+
+func GetAllUsersRequests(userId int) ([]models.RequestNoEngeeners, error) {
+	rows, err := pool.Query(context.Background(),
+		`Select requests.id as id, name, address, firstCoord,
+			secondCoord from requests 
+			Join objects on requests.objectId = objects.id
+			Join users_request on requests.id = users_request.requestId
+			Where users_request.userId = $1
+		`, userId)
+	if err != nil {
+		return nil, err
+	}
+	var requests []models.RequestNoEngeeners
+	for rows.Next() {
+		var request models.RequestNoEngeeners
+		rows.Scan(&request.Id, &request.Object.Name, &request.Object.Address,
+			&request.Object.Coords[0], &request.Object.Coords[1])
+		requests = append(requests, request)
+	}
+	defer rows.Close()
+	return requests, nil
+}

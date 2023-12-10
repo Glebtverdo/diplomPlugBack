@@ -1,4 +1,4 @@
-package rest
+package restTransport
 
 import (
 	"diplomPlugService/internal/transport/midlewares"

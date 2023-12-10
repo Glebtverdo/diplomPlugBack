@@ -67,10 +67,13 @@ func ChangeUser(user models.User) error {
 	return nil
 }
 
-func GetUserByLoginAndPassword(user models.UserLoginStruct) models.User {
-	query := fmt.Sprintf("Select * from users Where login = %s and password = %s", user.Login, user.Password)
+func GetUserByLoginAndPassword(user models.UserLoginStruct) (models.User, error) {
+	query := fmt.Sprintf("Select * from users Where login = '%s' and password = '%s'", user.Login, user.Password)
 	row := pool.QueryRow(context.Background(), query)
 	var userInfo models.User
 	row.Scan(&userInfo.Id, &userInfo.Login, &userInfo.Password, &userInfo.FirstName, &userInfo.LastName, &userInfo.MiddleName)
-	return userInfo
+	if userInfo.Id == 0 {
+		return userInfo, fmt.Errorf("unknown user")
+	}
+	return userInfo, nil
 }

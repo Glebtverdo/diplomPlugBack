@@ -49,3 +49,7 @@ type JwtTokenPair struct {
 	Access  string `json:"access"`
 	Refresh string `json:"refresh"`
 }
+
+type myKeyType string
+
+var UserKeyForContext myKeyType = "user"

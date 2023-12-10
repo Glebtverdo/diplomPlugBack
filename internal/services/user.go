@@ -25,7 +25,10 @@ func ChangeUser(user models.User) error {
 }
 
 func Login(loginPair models.UserLoginStruct) (models.JwtTokenPair, error) {
-	user := database.GetUserByLoginAndPassword(loginPair)
+	user, err := database.GetUserByLoginAndPassword(loginPair)
+	if err != nil {
+		return models.JwtTokenPair{}, err
+	}
 	payload := models.JwtClaims{
 		Type: "access",
 		UserInfo: models.UserInfo{
