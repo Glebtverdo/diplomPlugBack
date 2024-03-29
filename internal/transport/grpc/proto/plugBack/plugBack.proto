@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package plugBackGrpc;
 
-option go_package = "diplomPlugBack.plugBackGrpc;plugBackGrpc";
+option go_package = "engineersPathsMic.plugBackGrpc;plugBackGrpc";
 
 service PlugBackGrpc{
 	rpc Login (LoginRequest) returns (LoginResponse);

@@ -1,3 +1,7 @@
+
+
+
+
 name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
@@ -9,8 +13,12 @@ jobs:
   buildApp:
     runs-on: ubuntu-latest
     steps:
+    - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.20'
     - uses: actions/checkout@master
-    - run: cd cmd && go build
+    - run: go build ./cmd/*
     - name: Deploy to Staging server
       uses: easingthemes/ssh-deploy@main
       with:

@@ -77,11 +77,19 @@ func CreateNewRequest(request models.RequestBody) error {
 }
 
 func DeleteRequest(id int) error {
-	query := ("Delete from objects Where id = @id")
+	query := ("Delete from users_request Where requestId = @id")
 	args := pgx.NamedArgs{
 		"id": id,
 	}
 	res, queryErr := pool.Exec(context.Background(), query, args)
+	if queryErr != nil {
+		return queryErr
+	}
+	if res.RowsAffected() == 0 {
+		return fmt.Errorf("object with id = %d, does not exists", id)
+	}
+	query = ("Delete from requests Where id = @id")
+	res, queryErr = pool.Exec(context.Background(), query, args)
 	if queryErr != nil {
 		return queryErr
 	}

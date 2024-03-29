@@ -50,24 +50,24 @@ func checkToken(token string) (models.UserInfo, error) {
 	var infoFromToken models.JwtClaims
 	authHeader := strings.Split(token, " ")
 	if len(authHeader) != 2 {
-		return infoFromToken.UserInfo, fmt.Errorf("invalid token")
+		return infoFromToken.UserInfo, fmt.Errorf("1invalid token")
 	}
 
 	tokenPrefix := authHeader[0]
 	tokenString := authHeader[1]
 
 	if tokenPrefix != "Bearer" {
-		return infoFromToken.UserInfo, fmt.Errorf("invalid token")
+		return infoFromToken.UserInfo, fmt.Errorf("2invalid token")
 	}
 
 	_, err := jwt.ParseWithClaims(tokenString, &infoFromToken, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret word"), nil
 	})
 	if err != nil {
-		return infoFromToken.UserInfo, fmt.Errorf("invalid token")
+		return infoFromToken.UserInfo, fmt.Errorf("3invalid token")
 	}
 	if infoFromToken.Type != "access" {
-		return infoFromToken.UserInfo, fmt.Errorf("invalid token")
+		return infoFromToken.UserInfo, fmt.Errorf("4invalid token")
 	}
 
 	return infoFromToken.UserInfo, nil
@@ -87,15 +87,15 @@ func CheckAuthorizationUnaryInterceptor(
 	}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", fmt.Errorf("invalid token")
+		return "", fmt.Errorf("1invalid token")
 	}
 	text, err := getAndFirstTokenCheck(md.Get("authorization"))
 	if err != nil {
-		return "", fmt.Errorf("invalid token")
+		return "", fmt.Errorf("2invalid token")
 	}
 	user, err := checkToken(text)
 	if err != nil {
-		return "", fmt.Errorf("invalid token")
+		return "", fmt.Errorf(fmt.Sprintf("3, %s", err.Error()))
 	}
 	ctxWithUser := context.WithValue(ctx, models.UserKeyForContext, user)
 	return handler(ctxWithUser, req)

@@ -21,12 +21,15 @@ func (s *serverAPI) GetRequests(
 	}
 	requestList := []*plugBack.Request{}
 	for _, req := range requests {
+		var arr []float32
+		arr = append(arr, req.Object.Coords[0])
+		arr = append(arr, req.Object.Coords[1])
 		requestList = append(requestList, &plugBack.Request{
 			Id: int32(req.Id),
 			Object: &plugBack.Object{
 				Name:    req.Object.Name,
 				Address: req.Object.Address,
-				Coords:  req.Object.Coords[:],
+				Coords:  arr,
 			},
 		})
 	}
